@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: board
+
+  datasource:
+    url: jdbc:h2:mem:boarddb;DB_CLOSE_DELAY=-1   # JVM이 살아있는 동안 DB 유지
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        default_batch_fetch_size: 100
+        format_sql: false       # SQL 한 줄에 하나씩 → 세기 쉽다
+        generate_statistics: true
+
+logging:
+  level:
+    org.hibernate.SQL: debug            # SQL 출력. show-sql 대신 이걸 쓴다
+    org.hibernate.stat: debug
+    # org.hibernate.orm.jdbc.bind: trace  # ? 에 들어간 실제 값이 궁금할 때만 켠다
