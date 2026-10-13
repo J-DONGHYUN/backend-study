@@ -464,3 +464,92 @@ Content-Type: application/json
 - **"`@Controller`와 `@RestController` 차이는?"** → `@RestController` = `@Controller` + `@ResponseBody`. 반환값을 View 이름이 아니라 **응답 본문**으로 해석한다.
 - **"`@Valid` 검증은 언제 일어나나요?"** → 컨트롤러 호출 **전**, `HandlerAdapter`가 매개변수를 바인딩하는 단계.
 - **"JSON을 객체로 누가 바꾸나요?"** → `HttpMessageConverter`. Spring Boot에서는 `MappingJackson2HttpMessageConverter`가 기본.
+
+---
+
+# 구술 기록
+
+## 2026-10-13 (1일차) — 🟡 유지
+
+**Q1. Spring MVC가 무엇인가요?**
+
+> 스프링 mvc 패턴은 외부의 모든 API 요청을 dispatchServlet이 받아서 핸들러를 통해 해당
+> 컨트롤러에 보내줍니다. 컨트롤러에서 서비스로 보낸 후 DB까지 다녀와 모델을 만듭니다.
+> 이것을 VIEW로 반환까지 하는 것이 스프링 mvc 패턴입니다. 저는 프론트 작업을 항상 react로
+> 했기 때문에 따로 view를 만들지는 안하고 json으로 데이터를 응답하며 작업을 했습니다.
+
+**Q2. 당신은 Spring MVC를 어떻게 적용했나요? (`POST /posts` 예시)**
+
+> API 요청으로 컨트롤러에 들어오면 해당 HTTP 메서드로 먼저 가고, 요청으로 온 JSON을 DTO
+> 객체로 바꿔줍니다. service로 작업이 진행되고 DB까지 다녀와서 최종응답 DTO를 다시
+> 응답합니다. 이때 저는 컨트롤러를 @RestController로 했기 때문에 다시 json으로 반환하여
+> 응답을 합니다. react는 json 데이터만으로 화면이 만들어집니다.
+
+**꼬리. "JSON을 DTO로 바꿔준다" — 그건 누가 하나요?**
+
+> json으로 온 데이터가 서비스 로직을 실행하려면 객체 형태여야 합니다. 그렇기 때문에 필요한
+> 데이터 정보만 담을 수 있게 DTO를 만들었고, HTTP 메서드 인자로 RequestBody 애노테이션을
+> 넣어 요청이 들어오면 타입에 맞게 json에 있는 값들이 DTO 필드에 들어가도록 했습니다.
+
+### 채점
+
+```
+ ✅  DispatcherServlet 이 전부 받는다
+ ✅  Controller → Service → DB → 응답 DTO
+ ✅  @RestController 라서 JSON
+ ✅  @RequestBody 로 JSON → DTO
+ ✅  DTO 를 왜 쓰는지 (필요한 데이터만)      ← 10/08 엔 🟡. 이번엔 자연스럽게 나옴
+
+ ❌  "Front Controller" 라는 단어가 끝내 안 나옴
+ ❌  "MVC 패턴" 과 "Spring MVC" 를 또 섞음   ← 10/08 에 짚었던 그 혼동
+ ❌  꼬리 질문의 주어를 끝까지 못 댐
+```
+
+### 핵심 — 주어가 세 번 다 빠졌다
+
+```
+ "DTO 로 바꿔줍니다"                       ← 주어 없음
+ "@RequestBody 를 넣어 ... 들어가도록 했다"  ← 여전히 주어 없음
+```
+
+`@RequestBody` 는 **내가 건 스위치**다. 스위치를 거는 것과 **불을 켜는 것**은 다르다.
+
+```
+ ┌─────────────────────────────────────────────────┐
+ │  내가 쓴 코드                                     │
+ │     @PostMapping, @RequestBody, PostCreateRequest │
+ │     PostController, PostService, Post            │
+ └─────────────────────────────────────────────────┘
+                     ↕  이 경계가 흐린 게 문제
+ ┌─────────────────────────────────────────────────┐
+ │  Spring 이 대신 해주는 것                          │
+ │     DispatcherServlet  HandlerMapping            │
+ │     HandlerAdapter     ArgumentResolver          │
+ │     HttpMessageConverter(Jackson)                │
+ └─────────────────────────────────────────────────┘
+```
+
+### 못 댄 답
+
+```
+ ①  DispatcherServlet          요청 수신
+ ②  HandlerMapping             "이 URL 은 어느 메서드?"      → PostController.create
+ ③  HandlerAdapter             그 메서드를 호출할 준비
+ ④  ArgumentResolver           @RequestBody 를 보고 판단
+ ⑤  HttpMessageConverter       Content-Type: application/json 을 보고
+      └ Jackson                JSON  →  PostCreateRequest   ★ 여기가 "누가"
+ ⑥  PostController.create()    ← 내 코드가 처음 실행되는 지점
+```
+
+**⑥ 전까지는 전부 Spring이다.** 응답도 대칭이다 — `@RestController` 가 JSON으로 바꾸는 게
+아니라, **MessageConverter 를 쓰도록 지시**한다.
+
+```
+ 요청   JSON  ──[MessageConverter]──→  DTO   ──→  내 코드
+ 응답   내 코드 ──→  DTO  ──[MessageConverter]──→  JSON
+                         같은 놈이 양쪽에
+```
+
+### 다음에 같은 질문을 받으면
+
+첫 문장에 **"Front Controller 패턴"** 이 들어가야 한다. 그리고 **"MVC 패턴"이라고 부르지 않는다.**

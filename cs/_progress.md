@@ -8,7 +8,8 @@
 1. **생성자 주입** — 2026-10-08 재질문: "final 불변"만 답함. **테스트 용이성**이 계속 빠진다
 2. **Entity를 응답으로 직접 반환하면 안 되는 이유** — 민감정보는 답함. **API 스펙 ↔ DB 스키마 결합**이 빠진다 (가장 중요한 이유)
 3. **Entity에 `@Setter`를 쓰지 않는 이유** — "중요한 정보라서"는 모호. **도메인 규칙 우회**가 핵심
-4. **Spring MVC 요청 흐름** — 대본은 있으나 소리 내어 말해본 적 없음
+4. **Spring MVC = Front Controller 패턴** — 2026-10-13 구술에서 또 "MVC 패턴"이라 부름 (두 번째)
+4-1. **JSON→DTO 를 누가 하는가** — ArgumentResolver + HttpMessageConverter(Jackson). 꼬리질문 3번 돌려도 주어가 안 나옴
 5. **flush — create는 불필요하고 update/addComment는 필요한 이유** — 과제 #2 체크리스트 12개 참고
 6. **TCP 는 스트림이라 메시지 경계가 없다** — `Content-Length` 가 필요한 이유 (2026-10-10 틀림)
 7. ~~**`LEFT JOIN` + `COUNT(*)` 함정**~~ — 2026-10-13 해결 (🟢)
@@ -94,7 +95,7 @@
 | 트랜잭션 `readOnly` | 🟢 | 2026-10-08 | **🔴→🟢.** "더티체크를 안 한다, 스냅샷을 안 찍는다" 정확. 변경 감지와 연결해주자 바로 붙음 |
 | 전역 예외 처리 (`@RestControllerAdvice`) | 🟢 | 2026-10-10 | **🟡→🟢.** 두 번 구현. `Exception` fallback이 Spring의 4xx를 500으로 삼키는 함정까지 겪음 |
 | Bean Validation (`@Valid`, `@NotBlank`) | 🟡 | 2026-10-07 | `@NotNull`/`@NotEmpty`/`@NotBlank` 차이 확인 |
-| Spring MVC 요청 처리 흐름 | 🟡 | 2026-10-08 | 흐름은 대체로 맞게 설명. **MVC 패턴 ≠ Front Controller 패턴**을 혼동. `cs/spring/spring-mvc.md` |
+| Spring MVC 요청 처리 흐름 | 🟡 | 2026-10-13 | **구술 1일차.** 흐름은 끊기지 않음. **"Front Controller"가 끝내 안 나옴**, MVC 패턴과 또 혼동. **ArgumentResolver/MessageConverter를 못 댐** — 내 코드와 Spring의 경계가 흐리다 |
 | MVC 패턴 vs 3계층 구조 | 🟡 | 2026-10-08 | 다른 축이라는 것 확인. 우리 프로젝트엔 **View가 없다**는 점이 핵심 |
 | AOP | 🔴 | - | |
 | 빈 생명주기 | 🔴 | - | |
@@ -138,6 +139,7 @@
 | 2026-10-10 | **네트워크 실습 3·4 — HTTP/HTTPS**. 평문 노출 → TLS 암호화 비교. 체크리스트 9문항 (🟢4 / 🟡3 / 🔴2) |
 | 2026-10-10 | **SQL 1일차** — SELECT/WHERE/ORDER BY/LIMIT. 8문제 중 5개 정답 |
 | 2026-10-12 | **SQL 2일차 — JOIN**. 8문제. 개념은 전부 맞고 오타·문법으로 4개 실패. LEFT vs INNER 판단 기준 학습 |
+| 2026-10-13 | **구술 면접 1일차** — Spring MVC 2단 질문 + 꼬리. 🟡 유지. 주어(ArgumentResolver/MessageConverter)를 못 댐 |
 | 2026-10-13 | **SQL 3일차 — GROUP BY / 집계 / HAVING**. 8문제 중 7개 정답. `COUNT(*)` 함정 🔴→🟢. 불필요한 JOIN, `HAVING` 별칭 이식성 교정 |
 | 2026-10-09 | 로그 읽기 정리 (`cs/design/logging.md`). GitHub 공개 저장소 생성 |
 | 2026-10-10 | **과제 #2 게시판 API 완료.** N+1 🔴→🟢 (쿼리 12→3 직접 측정), 연관관계·쓰기지연·Aggregate 체득. 커서 페이징은 미실시 |
