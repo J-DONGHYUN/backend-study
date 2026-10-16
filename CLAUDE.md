@@ -24,9 +24,12 @@
 - cs/ : CS·백엔드 기초 (java, network, os, db, spring, design). 규칙은 cs/CLAUDE.md
 - cs/_progress.md : 로드맵과 주제별 이해도(🔴🟡🟢) + 다음 복습 대상. 세션 간 연속성은 이 파일이 담당한다.
 
-## 매일 루틴 (분량 고정)
+## 루틴 (분량 고정)
 - **SQL 4문제 · 30분 이내.** 난이도는 중간(실버) 수준으로 고정. 더 어렵게 내지 않는다.
 - **구술 면접 10~15분.** 규칙은 cs/CLAUDE.md
+- **코딩테스트 2문제 · 1시간** (30분 + 30분). 가끔. 규칙은 algorithms/CLAUDE.md
+- algorithms/ : 코딩테스트 (프로그래머스). 규칙은 algorithms/CLAUDE.md
+  - 유형별 파일(hash.md, sort.md, brute-force.md, bfs.md)에 쌓는다. 날짜별로 쪼개지 않는다.
 - blog/ : 기술 블로그(jdh-devlog.tistory.com) 초안. 글감은 assignments/ 와 cs/ 에서 나온다.
   - _ideas.md 에 글감을 한 줄로 모으고, blog/YYYY-MM-DD-주제.md 로 작성한다.
   - **글보다 시각화.** 스크롤 3~4번을 넘기지 않는다.
@@ -34,5 +37,4 @@
     핵심만 남기고 읽기 어려운 부분은 과감히 뺀다.
 
 ## 범위
-과제테스트, CS, 그리고 그 결과물을 블로그 글로 옮기는 것까지 다룬다.
-알고리즘/코딩테스트는 제외.
+과제테스트, CS, 코딩테스트, 그리고 그 결과물을 블로그 글로 옮기는 것까지 다룬다.
